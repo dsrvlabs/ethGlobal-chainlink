@@ -1,0 +1,11 @@
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('../public/pixel-font.ttf') format('truetype');
+}
+
+body {
+  margin: 0;
+  font-family: 'Press Start 2P', sans-serif;
+  background-color: #1e1e1e;
+  color: white;
+}
