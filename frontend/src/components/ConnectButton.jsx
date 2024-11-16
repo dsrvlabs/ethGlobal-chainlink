@@ -1,24 +1,22 @@
 import React, { useState } from "react";
-import { ethers } from "ethers";
 
 const ConnectButton = () => {
-  const [connected, setConnected] = useState(false); // 연결 상태 관리
-  const [account, setAccount] = useState(""); // 연결된 계정 저장
+  const [connected, setConnected] = useState(false);
+  const [account, setAccount] = useState("");
 
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
-        // MetaMask 요청으로 계정 연결
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-        setAccount(accounts[0]); // 첫 번째 계정 저장
+        setAccount(accounts[0]);
         setConnected(true);
       } catch (error) {
-        console.error("Failed to connect wallet:", error);
+        console.error("Wallet connection failed:", error);
       }
     } else {
-      alert("MetaMask is not installed!");
+      alert("MetaMask is not installed. Please install it and try again.");
     }
   };
 
@@ -29,10 +27,13 @@ const ConnectButton = () => {
         backgroundColor: "#ff007a",
         border: "none",
         color: "white",
-        borderRadius: "50px",
-        padding: "5px 20px",
-        fontSize: "14px",
+        borderRadius: "10px",
+        padding: "10px 20px",
+        fontSize: "12px",
+        fontFamily: "'Press Start 2P', sans-serif",
         cursor: "pointer",
+        textShadow: "2px 2px 0px #000",
+        boxShadow: "0px 4px 0px #000",
       }}
     >
       {connected ? `Connected: ${account.slice(0, 6)}...${account.slice(-4)}` : "Connect"}

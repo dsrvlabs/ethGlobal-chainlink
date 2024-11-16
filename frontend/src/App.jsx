@@ -1,5 +1,7 @@
 import React from "react";
+import Header from "./components/Header";
 import ConnectButton from "./components/ConnectButton";
+import MainButton from "./components/MainButton";
 
 const App = () => {
   return (
@@ -7,21 +9,25 @@ const App = () => {
       style={{
         backgroundColor: "#1e1e1e",
         height: "100vh",
-        color: "white",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
         position: "relative",
+        color: "#ff007a",
+        fontFamily: "'Press Start 2P', sans-serif",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          top: "20px",
-          right: "20px",
-          display: "flex",
-          gap: "10px",
-        }}
-      >
+      {/* 상단 연결 버튼 */}
+      <div style={{ position: "absolute", top: "20px", right: "20px" }}>
         <ConnectButton />
       </div>
+
+      {/* 메인 헤더 */}
+      <Header />
+
+      {/* 메인 버튼 */}
+      <MainButton />
     </div>
   );
 };
