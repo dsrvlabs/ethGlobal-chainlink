@@ -61,14 +61,14 @@ contract SubscriptionConsumer is VRFConsumerBaseV2Plus {
     // this limit based on the network that you select, the size of the request,
     // and the processing of the callback request in the fulfillRandomWords()
     // function.
-    uint32 public callbackGasLimit = 100000;
+    uint32 public callbackGasLimit = 1000000;
 
     // The default is 3, but you can set this higher.
     uint16 public requestConfirmations = 3;
 
     // For this example, retrieve 2 random values in one request.
     // Cannot exceed VRFCoordinatorV2_5.MAX_NUM_WORDS.
-    uint32 public numWords = 2;
+    uint32 public numWords = 1;
 
     /**
      * HARDCODED FOR SEPOLIA
@@ -91,7 +91,7 @@ contract SubscriptionConsumer is VRFConsumerBaseV2Plus {
     // `false` to pay in LINK
     function requestRandomWords(
         bool enableNativePayment
-    ) internal onlyOwner returns (uint256 requestId) {
+    ) internal returns (uint256 requestId) {
         // Will revert if subscription is not set and funded.
         requestId = s_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
@@ -126,21 +126,6 @@ contract SubscriptionConsumer is VRFConsumerBaseV2Plus {
         s_requests[_requestId].fulfilled = true;
         s_requests[_requestId].randomWords = _randomWords;
         emit RequestFulfilled(_requestId, _randomWords);
-		// NEW
-        require(gameState == GameState.Calculating, "Not in calculation state");
-        uint256 winnerIndex = _randomWords[0] % players.length;
-        winner = players[winnerIndex];
-
-        uint256 totalReward = depositAmount * players.length;
-        require(
-            linkToken.transfer(winner, totalReward),
-            "Token transfer to winner failed"
-        );
-
-        emit WinnerDeclared(winner, totalReward);
-
-        resetGame();
-		//
     }
 
     function getRequestStatus(
@@ -169,7 +154,7 @@ contract SubscriptionConsumer is VRFConsumerBaseV2Plus {
         }
     }
 
-    function resetGame() internal {
+    function resetGame() public onlyOwner {
         delete players;
         winner = address(0);
         gameState = GameState.Open;
@@ -180,6 +165,20 @@ contract SubscriptionConsumer is VRFConsumerBaseV2Plus {
         return players;
     }
 
-	//
+    function distribute() external {
+        require(gameState == GameState.Calculating, "Not in calculation state");
+        uint256 winnerIndex = s_requests[lastRequestId].randomWords[0] % players.length;
+        winner = players[winnerIndex];
 
+        uint256 totalReward = depositAmount * players.length;
+        require(
+            linkToken.transfer(winner, totalReward),
+            "Token transfer to winner failed"
+        );
+
+        emit WinnerDeclared(winner, totalReward);
+
+        resetGame();
+    }
+	//
 }
