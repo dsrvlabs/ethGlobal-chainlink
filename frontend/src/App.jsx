@@ -16,7 +16,6 @@ function App() {
           path="/result"
           element={
             <Result
-			   imageUrl="https://via.placeholder.com/300"
                description="Selected winner using CHAINLINK VRF"
                winnerAddress="0x1234567890abcdef1234567890abcdef12345678"
             />

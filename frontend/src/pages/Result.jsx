@@ -1,6 +1,44 @@
 import React from "react";
+import { ethers } from "ethers";
 
-const Result = ({ description, winnerAddress, onClaim }) => {
+const SECOND_CONTRACT_ADDRESS = "0xF3BDa598129334fE483C313b46E6953D33B8aC00"
+const SECOND_ABI = [
+  {
+    inputs: [],
+    name: "distribute",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
+
+const Result = ({ description, winnerAddress }) => {
+  const handleClaim = async () => {
+    try {
+      if (!window.ethereum) {
+        alert("MetaMask is not installed!");
+        return;
+      }
+
+      // 연결된 Ethereum provider 가져오기
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(SECOND_CONTRACT_ADDRESS, SECOND_ABI, signer);
+
+      // distribute 함수 호출
+      const tx = await contract.distribute();
+      console.log("Transaction sent:", tx.hash);
+
+      // 트랜잭션 확인 대기
+      const receipt = await tx.wait();
+      console.log("Transaction confirmed:", receipt);
+      alert("Reward distributed successfully!");
+    } catch (error) {
+      console.error("Error calling distribute:", error);
+      alert("Failed to distribute reward.");
+    }
+  };
+
   return (
     <div
       style={{
@@ -61,7 +99,7 @@ const Result = ({ description, winnerAddress, onClaim }) => {
 
       {/* Claim Reward 버튼 */}
       <button
-        onClick={onClaim}
+        onClick={handleClaim}
         style={{
           marginTop: "40px",
           backgroundColor: "#ff007a",
