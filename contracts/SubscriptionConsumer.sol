@@ -30,6 +30,7 @@ contract SubscriptionConsumer is VRFConsumerBaseV2Plus {
     IERC20 public linkToken; // LINK token for deposits
     uint256 public depositAmount; // Fixed deposit amount per user
     address public winner; // Address of the winner
+    address public lastWinner; // Address of the winner
 
     enum GameState { Open, Closed, Calculating, Calculated }
     GameState public gameState;
@@ -122,6 +123,7 @@ contract SubscriptionConsumer is VRFConsumerBaseV2Plus {
 
     function resetGame() public onlyOwner {
         delete players;
+        lastWinner = winner;
         winner = address(0);
         gameState = GameState.Open;
         emit GameReset();
@@ -147,3 +149,4 @@ contract SubscriptionConsumer is VRFConsumerBaseV2Plus {
         resetGame();
     }
 }
+
