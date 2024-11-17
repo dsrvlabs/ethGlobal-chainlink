@@ -17,7 +17,6 @@ function App() {
           element={
             <Result
                description="Selected winner using CHAINLINK VRF"
-               winnerAddress="0x1234567890abcdef1234567890abcdef12345678"
             />
           }
         /> {/* /result 경로 */}
