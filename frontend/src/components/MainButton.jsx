@@ -17,7 +17,7 @@ const FIRST_ABI = [
   },
 ];
 
-const SECOND_CONTRACT_ADDRESS = "0x0302736820c13703309ba5b2c3f446f493efe1ed";
+const SECOND_CONTRACT_ADDRESS = "0xF3BDa598129334fE483C313b46E6953D33B8aC00";
 const SECOND_ABI = [
   {
     inputs: [],
@@ -116,14 +116,14 @@ const MainButton = () => {
       const signer = provider.getSigner();
 
       // 첫 번째 컨트랙트: approve 호출
-      const firstContract = new ethers.Contract(FIRST_CONTRACT_ADDRESS, FIRST_ABI, signer);
-      const spenderAddress = SECOND_CONTRACT_ADDRESS;
-      const amount = ethers.utils.parseUnits("1.0", 18);
+      //const firstContract = new ethers.Contract(FIRST_CONTRACT_ADDRESS, FIRST_ABI, signer);
+      //const spenderAddress = SECOND_CONTRACT_ADDRESS;
+      //const amount = ethers.utils.parseUnits("1.0", 18);
 
-      console.log("Calling approve...");
-      const approveTx = await firstContract.approve(spenderAddress, amount);
-      await approveTx.wait();
-      console.log("Approve transaction confirmed!");
+      //console.log("Calling approve...");
+      //const approveTx = await firstContract.approve(spenderAddress, amount);
+      //await approveTx.wait();
+      //console.log("Approve transaction confirmed!");
 
       // 두 번째 컨트랙트: joinGame 호출
       const secondContract = new ethers.Contract(SECOND_CONTRACT_ADDRESS, SECOND_ABI, signer);
@@ -131,7 +131,7 @@ const MainButton = () => {
       console.log("Calling joinGame...");
       const gasLimit = await secondContract.estimateGas.joinGame(); // 가스 추정
       const joinGameTx = await secondContract.joinGame({
-        gasLimit: gasLimit.add(ethers.BigNumber.from("100000000")), // 가스 한도 추가
+        gasLimit: gasLimit.add(ethers.BigNumber.from("300000")), // 가스 한도 추가
       });
       console.log("JoinGame transaction sent:", joinGameTx.hash);
 

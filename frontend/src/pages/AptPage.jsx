@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
+import { useNavigate } from "react-router-dom";
 
-const SECOND_CONTRACT_ADDRESS = "0x0302736820c13703309ba5b2c3f446f493efe1ed";
+const SECOND_CONTRACT_ADDRESS = "0xF3BDa598129334fE483C313b46E6953D33B8aC00";
 const SECOND_ABI = [
   {
     inputs: [],
     name: "getPlayers",
     outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "gameState",
+    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
     stateMutability: "view",
     type: "function",
   },
@@ -17,6 +25,8 @@ const colors = ["#8000ff", "#00bfff", "#ff4500", "#32cd32"]; // 사각형 색상
 const AptPage = () => {
   const [players, setPlayers] = useState([]); // 게임 참여자 주소 배열
   const [currentAccount, setCurrentAccount] = useState(null); // 현재 사용자 주소
+  const [loadingDots, setLoadingDots] = useState(""); // 점 애니메이션
+  const navigate = useNavigate(); // 페이지 이동
 
   useEffect(() => {
     // 현재 사용자 주소 가져오기
@@ -50,10 +60,30 @@ const AptPage = () => {
     fetchPlayers();
   }, []);
 
-  // 주소를 축약하는 함수
+  useEffect(() => {
+    // gameState 상태 체크 (5초마다)
+    const interval = setInterval(async () => {
+      try {
+        if (window.ethereum) {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const contract = new ethers.Contract(SECOND_CONTRACT_ADDRESS, SECOND_ABI, provider);
+
+          const state = await contract.gameState();
+          if (state >= 2) {
+            navigate("/pending"); // gameState가 2일 경우 Pending 페이지로 이동
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching gameState:", error);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval); // 컴포넌트 언마운트 시 interval 정리
+  }, [navigate]);
+
   const shortenAddress = (address) => {
     if (!address) return "";
-    return `${address.slice(0, 6)}...${address.slice(-4)}`; // 앞 6자리와 뒤 4자리만 표시
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   return (
@@ -76,14 +106,13 @@ const AptPage = () => {
           color: "#ff007a",
           fontSize: "72px",
           textShadow: "4px 4px 0px #000",
-          position: "absolute",
-          top: "20px",
+          marginBottom: "40px",
         }}
       >
         APT.
       </h1>
 
-      {/* 3개의 사각형 */}
+      {/* 사각형 리스트 */}
       <div
         style={{
           display: "flex",
