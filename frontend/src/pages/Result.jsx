@@ -10,10 +10,18 @@ const SECOND_ABI = [
     stateMutability: "view",
     type: "function",
   },
+  {
+    inputs: [],
+    name: "distribute",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
 ];
 
 const Result = ({ description }) => {
   const [winnerAddress, setWinnerAddress] = useState(null); // Winner 주소 상태
+  const [isClaiming, setIsClaiming] = useState(false); // Claim 상태 관리
 
   useEffect(() => {
     const fetchWinner = async () => {
@@ -28,7 +36,7 @@ const Result = ({ description }) => {
         const contract = new ethers.Contract(SECOND_CONTRACT_ADDRESS, SECOND_ABI, provider);
 
         // winner 호출
-        const winner = await contract.winner();
+        const winner = await contract.lastWinner();
         setWinnerAddress(winner);
       } catch (error) {
         console.error("Error fetching winner:", error);
@@ -37,6 +45,34 @@ const Result = ({ description }) => {
 
     fetchWinner();
   }, []);
+
+  const handleClaim = async () => {
+    try {
+      setIsClaiming(true); // Claim 상태 시작
+      if (!window.ethereum) {
+        alert("MetaMask is not installed!");
+        return;
+      }
+
+      // Ethereum provider 연결
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(SECOND_CONTRACT_ADDRESS, SECOND_ABI, signer);
+
+      // distribute 함수 호출
+      const tx = await contract.distribute();
+      console.log("Transaction sent:", tx.hash);
+
+      // 트랜잭션 확인 대기
+      await tx.wait();
+      alert("Reward distributed successfully!");
+    } catch (error) {
+      console.error("Error claiming reward:", error);
+      alert("Failed to distribute reward.");
+    } finally {
+      setIsClaiming(false); // Claim 상태 종료
+    }
+  };
 
   return (
     <div
@@ -113,6 +149,27 @@ const Result = ({ description }) => {
           Fetching Winner...
         </div>
       )}
+
+      {/* Claim Reward 버튼 */}
+      <button
+        onClick={handleClaim}
+        disabled={isClaiming}
+        style={{
+          marginTop: "40px",
+          backgroundColor: isClaiming ? "#888" : "#ff007a",
+          border: "none",
+          color: "white",
+          borderRadius: "10px",
+          padding: "15px 40px",
+          fontSize: "18px",
+          fontFamily: "'Press Start 2P', sans-serif",
+          cursor: isClaiming ? "not-allowed" : "pointer",
+          textShadow: "2px 2px 0px #000",
+          boxShadow: "0px 4px 0px #000",
+        }}
+      >
+        {isClaiming ? "Claiming..." : "Claim Reward"}
+      </button>
     </div>
   );
 };
