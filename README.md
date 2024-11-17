@@ -4,3 +4,12 @@
 - Use Chainlink VRF v2.5 APIs
 
 
+## Installation
+
+```
+$ cd backend
+$ npm install
+$ cd ../frontend
+$ npm install
+```
+
