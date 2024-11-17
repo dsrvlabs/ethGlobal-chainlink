@@ -1,6 +1,5 @@
 const express = require("express");
 const path = require("path");
-const { joinContract } = require("./controllers/contractController");
 
 require("dotenv").config();
 
